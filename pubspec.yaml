@@ -16,6 +16,7 @@ dependencies:
   shared_preferences: ^0.5.6
   provider: ^3.0.2
   get_it:
+  stepper: ^0.0.2
 
 dev_dependencies:
   flutter_test:
