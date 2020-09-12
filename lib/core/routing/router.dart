@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_registration_ui/core/routing/routes.dart';
-import 'package:flutter_registration_ui/ui/views/home_view.dart';
-import 'package:flutter_registration_ui/ui/views/sign_up_view.dart';
+import 'package:flutter_registration_ui/ui/views/home/home_view.dart';
+import 'package:flutter_registration_ui/ui/views/signup/sign_up_view.dart';
 
 class PageRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {

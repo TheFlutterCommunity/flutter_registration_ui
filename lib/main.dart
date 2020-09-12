@@ -9,7 +9,6 @@ import 'core/viewmodels/sign_up_viewmodel.dart';
 import 'ui/styles/themes.dart';
 
 
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setupLocator();

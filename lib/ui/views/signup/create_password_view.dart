@@ -1,121 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_registration_ui/core/routing/routes.dart';
 import 'package:flutter_registration_ui/core/utils/Utils.dart';
+import 'package:flutter_registration_ui/core/viewmodels/sign_up_viewmodel.dart';
 import 'package:flutter_registration_ui/ui/shared/custom_text_form_field.dart';
+import 'package:provider/provider.dart';
 
-class SignUpView extends StatefulWidget {
+class CreatePasswordView extends StatefulWidget {
   @override
-  _SignUpViewState createState() => _SignUpViewState();
+  _CreatePasswordViewState createState() => _CreatePasswordViewState();
 }
 
-class _SignUpViewState extends State<SignUpView> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+class _CreatePasswordViewState extends State<CreatePasswordView> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _passwordController = new TextEditingController();
 
-  double _height;
-  double _width;
-
-  String _label;
-  Color _labelColor;
-  bool _isLowerCase = false;
-  bool _isUpperCase = false;
-  bool _isNumberCase = false;
-  bool _isSpecialSymbolCase = false;
 
   @override
   Widget build(BuildContext context) {
-    _height = MediaQuery.of(context).size.height;
-    _width = MediaQuery.of(context).size.width;
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.blueAccent,
-        title: Text('Create Account'),
-        centerTitle: false,
-      ),
-      backgroundColor: Colors.blueAccent,
-      body: Container(
-        child: Container(
-          height: _height,
-          child: Column(
-            children: <Widget>[
-              _buildSignUpStepper(),
-              SizedBox(
-                height: 20,
-              ),
-              _buildTitleWidget(),
-              SizedBox(
-                height: 20,
-              ),
-              _buildPasswordWidget(),
-              SizedBox(
-                height: 20,
-              ),
-              _buildCompatibilityWidget(),
-              _buildNextButton(),
-            ],
+    return Container(
+      color: Colors.blueAccent,
+      //height: _height-1,
+      child: Column(
+        children: <Widget>[
+          _buildTitleWidget(),
+          SizedBox(
+            height: 20,
           ),
-        ),
+          _buildPasswordWidget(),
+          SizedBox(
+            height: 20,
+          ),
+          _buildCompatibilityWidget(),
+        ],
       ),
     );
   }
-
-  Widget _buildSignUpStepper() => Container(
-        height: 72,
-        child: Theme(
-          data: ThemeData(
-            canvasColor: Colors.blueAccent.withOpacity(0.6),
-            //primaryColor: Colors.blueAccent
-          ),
-          child: Stepper(
-              type: StepperType.horizontal,
-              physics: ClampingScrollPhysics(),
-              steps: [
-                Step(
-                  isActive: false,
-                  state: StepState.indexed,
-                  title: Text(""),
-                  content: Text(''),
-                ),
-                Step(
-                  isActive: false,
-                  state: StepState.indexed,
-                  title: Text(""),
-                  content: Text(''),
-                ),
-                Step(
-                  isActive: false,
-                  state: StepState.indexed,
-                  title: Text(""),
-                  content: Text(''),
-                ),
-                Step(
-                  isActive: false,
-                  state: StepState.indexed,
-                  title: Text(""),
-                  content: Text(''),
-                ),
-              ],
-              // currentStep: _stepperIndex,
-              onStepTapped: (index) {
-                /*setState(() {
-                  _stepperIndex = index;
-                });*/
-              },
-              onStepCancel: () {
-                //_updateStepperPrevState(_stepperIndex);
-              },
-              onStepContinue: () {
-                //_updateStepperNextState(_stepperIndex);
-              },
-              controlsBuilder: (BuildContext context, {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
-                return Container();
-              }),
-        ),
-      );
 
   Widget _buildTitleWidget() {
     return Container(
@@ -125,26 +44,21 @@ class _SignUpViewState extends State<SignUpView> {
         Text(
           'Create Password',
           style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
+              color: Colors.white.withOpacity(0.8), fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 0.17),
         ),
         SizedBox(
-          height: 4,
+          height: 8,
         ),
         Text(
           'Password will be used to login to account',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-          ),
+          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13, letterSpacing: 0.17),
         ),
       ]),
     );
   }
 
   Widget _buildPasswordWidget() {
+    final model = Provider.of<SignUpViewModel>(context);
     return Container(
       margin: EdgeInsets.only(left: 12, right: 12, top: 20),
       decoration: BoxDecoration(
@@ -157,18 +71,17 @@ class _SignUpViewState extends State<SignUpView> {
           keyboardType: TextInputType.visiblePassword,
           textEditingController: _passwordController,
           prefixIcon: null,
-          obscureText: true,
+          obscureText: model.obscureText,
           suffixIcon: Icons.visibility,
           hint: 'Create Password',
-          onChange: (value) {
-            setState(() {
-              _label = Utils.getPasswordComplexityLabel(value);
-              _labelColor = Utils.getPasswordComplexityLabelColor(value);
-              _isLowerCase = Utils.isLowerCase(value);
-              _isUpperCase = Utils.isUpperCase(value);
-              _isNumberCase = Utils.isNumberCase(value);
-              _isSpecialSymbolCase = Utils.isSpecialSymbolCase(value);
-            });
+          suffixPressed: () {
+            model.obscureText = !model.obscureText;
+          },
+          onChange: (String value) {
+            if (value.trim().length == 0) {
+              model.label = '';
+            }
+            model.setPasswordComplexity(value);
           },
         ),
       ),
@@ -176,6 +89,7 @@ class _SignUpViewState extends State<SignUpView> {
   }
 
   Widget _buildCompatibilityWidget() {
+    final model = Provider.of<SignUpViewModel>(context);
     return Container(
         alignment: Alignment.centerLeft,
         margin: EdgeInsets.only(left: 12, right: 12),
@@ -193,9 +107,9 @@ class _SignUpViewState extends State<SignUpView> {
                   width: 8,
                 ),
                 Text(
-                  _label != null && _label.trim().length > 0 ? _label : '',
-                  style:
-                      TextStyle(color: _labelColor != null ? _labelColor : Colors.white, fontWeight: FontWeight.bold),
+                  model.label != null && model.label.trim().length > 0 ? model.label : '',
+                  style: TextStyle(
+                      color: model.labelColor != null ? model.labelColor : Colors.white, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -207,7 +121,7 @@ class _SignUpViewState extends State<SignUpView> {
                 Expanded(
                   child: Column(
                     children: [
-                      _isLowerCase
+                      model.isLowerCase
                           ? Icon(
                               Icons.check_circle,
                               color: Colors.lightGreenAccent,
@@ -230,7 +144,7 @@ class _SignUpViewState extends State<SignUpView> {
                 Expanded(
                   child: Column(
                     children: [
-                      _isUpperCase
+                      model.isUpperCase
                           ? Icon(
                               Icons.check_circle,
                               color: Colors.lightGreenAccent,
@@ -253,7 +167,7 @@ class _SignUpViewState extends State<SignUpView> {
                 Expanded(
                   child: Column(
                     children: [
-                      _isNumberCase
+                      model.isNumberCase
                           ? Icon(
                               Icons.check_circle,
                               color: Colors.lightGreenAccent,
@@ -276,7 +190,7 @@ class _SignUpViewState extends State<SignUpView> {
                 Expanded(
                   child: Column(
                     children: [
-                      _isSpecialSymbolCase
+                      model.isSpecialSymbolCase
                           ? Icon(
                               Icons.check_circle,
                               color: Colors.lightGreenAccent,
@@ -300,30 +214,5 @@ class _SignUpViewState extends State<SignUpView> {
             )
           ],
         ));
-  }
-
-  Widget _buildNextButton() {
-    return Expanded(
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-          height: 40,
-          margin: EdgeInsets.only(left: 12, right: 12, bottom: 12),
-          child: RaisedButton(
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-            onPressed: () {},
-            textColor: Colors.white,
-            padding: EdgeInsets.all(0.0),
-            child: Container(
-              alignment: Alignment.center,
-              color: Colors.blueAccent.withOpacity(0.7),
-              padding: const EdgeInsets.all(12.0),
-              child: Text('Next', style: TextStyle(color: Colors.white, fontSize: 14)),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

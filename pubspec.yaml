@@ -17,6 +17,7 @@ dependencies:
   provider: ^3.0.2
   get_it:
   stepper: ^0.0.2
+  intl:
 
 dev_dependencies:
   flutter_test:

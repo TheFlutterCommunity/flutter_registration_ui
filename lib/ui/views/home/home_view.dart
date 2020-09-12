@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_registration_ui/core/routing/routes.dart';
+import 'package:flutter_registration_ui/core/utils/Utils.dart';
+import 'package:flutter_registration_ui/core/viewmodels/sign_up_viewmodel.dart';
 import 'package:flutter_registration_ui/ui/shared/custom_shape.dart';
 import 'package:flutter_registration_ui/ui/shared/custom_text_form_field.dart';
+import 'package:provider/provider.dart';
 import 'package:stepper/stepper.dart';
 
 class HomeView extends StatefulWidget {
@@ -36,7 +39,7 @@ class _HomeViewState extends State<HomeView> {
                 child: Column(
                   children: <Widget>[
                     SizedBox(
-                      height: 170,
+                      height: 190,
                     ),
                     _buildWelcomeWidget(),
                     _buildWelcomeTextWidget(),
@@ -57,8 +60,12 @@ class _HomeViewState extends State<HomeView> {
         margin: EdgeInsets.only(top: 40),
         child: Theme(
           data: ThemeData(
-            canvasColor: Colors.blueAccent.withOpacity(0.6),
-              //primaryColor: Colors.blueAccent
+            canvasColor: Colors.blueAccent.withOpacity(0.7),
+              applyElevationOverlayColor: true,
+              primarySwatch: Colors.green,
+
+
+
           ),
           child: Stepper(
               type: StepperType.horizontal,
@@ -109,11 +116,11 @@ class _HomeViewState extends State<HomeView> {
 
   Widget clipShape() {
     return Opacity(
-      opacity: 0.75,
+      opacity: 0.8,
       child: ClipPath(
         clipper: CustomShapeClipper(),
         child: Container(
-          height: 200,
+          height: 220,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [Colors.blue, Colors.blueAccent],
@@ -194,6 +201,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildEmailWidget() {
+    final model = Provider.of<SignUpViewModel>(context);
     return Container(
       margin: EdgeInsets.only(left: 12, right: 12, top: 20),
       padding: EdgeInsets.all(10),
@@ -207,6 +215,15 @@ class _HomeViewState extends State<HomeView> {
           keyboardType: TextInputType.emailAddress,
           textEditingController: _emailController,
           prefixIcon: Icons.email_outlined,
+          obscureText: false,
+          validate: (value) {
+            if (value != null && value.trim().length > 0) {
+              return Utils.isValidEmail(value) ? null : "Enter the valid email";
+            } else if (value.trim().length == 0) {
+              return 'Enter the email';
+            }
+          },
+          autoValidate: model.autoValidate,
           hint: 'Email',
         ),
       ),
@@ -214,6 +231,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildNextButton() {
+    final model = Provider.of<SignUpViewModel>(context);
     return Expanded(
       child: Align(
         alignment: Alignment.bottomCenter,
@@ -224,7 +242,10 @@ class _HomeViewState extends State<HomeView> {
             elevation: 0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
             onPressed: () {
-              Navigator.of(context).pushNamed(Routes.SignUpRoute);
+              model.autoValidate = true;
+              if (_formKey.currentState.validate()) {
+                Navigator.of(context).pushNamed(Routes.SignUpRoute);
+              }
             },
             textColor: Colors.white,
             padding: EdgeInsets.all(0.0),

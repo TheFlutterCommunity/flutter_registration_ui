@@ -9,6 +9,9 @@ class CustomTextFormField extends StatefulWidget {
   final IconData suffixIcon;
   final Color boxColor;
   final Function onChange;
+  final Function validate;
+  final bool autoValidate;
+  final Function suffixPressed;
 
   String fieldName;
   CustomTextFormField({
@@ -17,10 +20,13 @@ class CustomTextFormField extends StatefulWidget {
     this.keyboardType,
     this.prefixIcon,
     this.suffixIcon,
-    this.obscureText = false,
+    this.obscureText = true,
+    this.autoValidate = false,
     this.fieldName,
     this.boxColor,
     this.onChange,
+    this.validate,
+    this.suffixPressed,
   });
 
   @override
@@ -40,6 +46,10 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         textInputAction: TextInputAction.done,
         keyboardType: widget.keyboardType,
         obscureText: widget.obscureText,
+        validator: (value){
+          return widget.validate(value);
+        },
+        autovalidate: widget.autoValidate,
         maxLines: 1,
         onChanged: (value){
           if(value!=null && value.trim().length>0) {
@@ -60,10 +70,15 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             color: Colors.grey,
             size: 20,
           ):null,
-          suffixIcon: widget.suffixIcon!=null?Icon(
-            widget.suffixIcon,
-            color: suffixIconColor,
-            size: 20,
+          suffixIcon: widget.suffixIcon!=null?InkWell(
+            onTap: (){
+              widget.suffixPressed();
+            },
+            child: Icon(
+              widget.suffixIcon,
+              color: suffixIconColor,
+              size: 20,
+            ),
           ):null,
           hintText: widget.hint,
           enabledBorder: OutlineInputBorder(
